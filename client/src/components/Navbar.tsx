@@ -10,7 +10,7 @@ const Navbar = () => {
     return (
         <Fragment>
             <CssBaseline />
-                <AppBar position="static" >
+                <AppBar position="static" color="inherit">
                     <Box sx={{ 'display': 'flex' }}>
                         <Box sx={{ 'padding': '15px 10px 10px 15px',  }}>
                             <ChecklistIcon />

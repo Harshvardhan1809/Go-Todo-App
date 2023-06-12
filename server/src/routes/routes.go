@@ -13,7 +13,7 @@ package routes
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/Harshvardhan1809/Go-Todo-App/src/controllers"
+	"github.com/Harshvardhan1809/Go-Todo-App/controllers" 
 )
 
 var TodoAppRoutes = func(router *mux.Router){

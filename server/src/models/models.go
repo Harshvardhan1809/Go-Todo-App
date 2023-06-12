@@ -2,7 +2,8 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/Harshvardhan1809/Go-Todo-App/src/config"
+	"github.com/Harshvardhan1809/Go-Todo-App/config"
+	"time"
 )
 
 var db *gorm.DB
@@ -27,6 +28,8 @@ type User struct{
 type Task struct{
 	gorm.Model
 	UserID uint `json: "userId"` // foreign key
+	CreatedAt time.Time `json: "createdAt"`
+	CompletedAt time.Time `json: "completedAt"`
 	Title string `json: "name"`
 	Description string `json: "description"`
 	Status string `json: "status"`

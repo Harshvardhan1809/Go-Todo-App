@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"github.com/gorilla/mux"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/Harshvardhan1809/Go-Todo-App/src/routes"
+	"github.com/Harshvardhan1809/Go-Todo-App/routes"
 )
 
 func main(){

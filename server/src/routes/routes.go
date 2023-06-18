@@ -12,10 +12,23 @@ package routes
 // GET login form : /auth/login
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/Harshvardhan1809/Go-Todo-App/controllers" 
 )
 
 var TodoAppRoutes = func(router *mux.Router){
-	router.HandleFunc("/task/{date}", controllers.GetTaskByDate).Methods("GET")
+	router.HandleFunc("/task/delete/{id}/", controllers.DeleteTaskByID).Methods("DELETE")
+	router.HandleFunc("/task/user/{user_id}/", controllers.GetTasks).Methods("GET")
+	router.HandleFunc("/task/date/{user_id}/{date}/", controllers.GetTaskByDate).Methods("GET")
+	router.HandleFunc("/task/prev/{user_id}/", controllers.GetTaskPrevious).Methods("GET")
+	router.HandleFunc("/task/{id}/", controllers.GetTaskByID).Methods("GET")
+	router.HandleFunc("/task/update/{id}/", controllers.UpdateTaskByID).Methods("PUT")
+	router.HandleFunc("/task/{user_id}/", controllers.PostTaskNew).Methods("POST") 
+
+	router.HandleFunc("/users/", controllers.GetUsers).Methods("GET")
+	// router.HandleFunc("/auth/{signin}", controllers.AuthCreateUser).Methods("POST")
+	// router.HandleFunc("/auth/{login}", controllers.AuthLogin).Methods("GET")
+
+	fmt.Println("Didn't match any route lol")
 }

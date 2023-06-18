@@ -14,7 +14,7 @@ func main(){
 	// r.HandleFunc("/home", homeHandler)
 	// http.ListenAndServe(":80", r)		
 
-	routes.GetTaskByDate(r)
+	routes.TodoAppRoutes(r)
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe("localhost:9010", r))
 

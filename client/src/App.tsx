@@ -1,41 +1,25 @@
 import React, { Fragment, useState } from "react";
-import { BrowserRouter } from 'react-router-dom'
-import Navbar from "./components/Navbar";
-import TodoList from "./components/Todolist"
-import ModalForm from "./components/ModalForm"
-import { Container, Typography } from "@mui/material";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate} from 'react-router-dom';
+import Login from "./scenes/Login";
+import Signup from "./scenes/Signup";
+import Home from "./scenes/Home";
+import AuthWrapper from "./components/AuthWrapper";
 
 const App = () => {
 
-    const [modalOpen, setModalOpen] =  useState(false);
-
-    const handleOpen = () => {
-        setModalOpen(true);
-    }
-
-    const handleClose = () => {
-        setModalOpen(false);
-    }
-
     return (
             <div className="app">
-                <BrowserRouter>
-                    <Fragment>
-                        <Navbar/>
-                        <main>
-                            <div>
-                                <Container maxWidth="sm" sx={{"text-align": "center", "margin-top": "25px"}}>
-                                    <Typography variant="h4" gutterBottom>TODO App</Typography>
-                                    <Typography variant="h6" gutterBottom>A todo app to list down and manage your daily tasks!</Typography>
-                                </Container>
-                                <Container>
-                                    <TodoList modalOpen={handleOpen}/>
-                                    <ModalForm open={modalOpen} handleClose={handleClose}/>
-                                </Container>
-                            </div>
-                        </main>
-                    </Fragment>
-                </BrowserRouter>
+                <Router>
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
+                        <Route path="" element={
+                            <AuthWrapper>
+                                <Home/>
+                            </AuthWrapper>
+                        }/>
+                    </Routes>
+                </Router>
             </div>
     )
 }

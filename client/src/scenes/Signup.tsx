@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Authentication = () => {
+const Signup = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const Authentication = () => {
   )
 }
 
-export default Authentication;
+export default Signup

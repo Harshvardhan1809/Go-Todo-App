@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/Harshvardhan1809/Go-Todo-App/controllers" 
+	"github.com/Harshvardhan1809/Go-Todo-App/middleware" 
 )
 
 var TodoAppRoutes = func(router *mux.Router){
@@ -27,8 +28,11 @@ var TodoAppRoutes = func(router *mux.Router){
 	router.HandleFunc("/task/{user_id}/", controllers.PostTaskNew).Methods("POST") 
 
 	router.HandleFunc("/users/", controllers.GetUsers).Methods("GET")
-	// router.HandleFunc("/auth/{signin}", controllers.AuthCreateUser).Methods("POST")
-	// router.HandleFunc("/auth/{login}", controllers.AuthLogin).Methods("GET")
+
+	router.HandleFunc("/auth/signin", controllers.SignUp).Methods("POST")
+	router.HandleFunc("/auth/login", controllers.LogIn).Methods("GET")
+	router.HandleFunc("/auth/validate", middleware.RequireAuth).Methods("GET")
 
 	fmt.Println("Didn't match any route lol")
 }
+// controllers.Validate

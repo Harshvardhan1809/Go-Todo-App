@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"log"
 	"strconv"
 	"reflect"
 	"encoding/json"
@@ -78,19 +79,26 @@ func PostTaskNew(w http.ResponseWriter, r *http.Request){
 
 	fmt.Println("In the post new task controller")
 
-	r.ParseForm()
-	for key, value := range r.Form {
-		fmt.Println("%s = %s \n", key, value)
+	var taskBody struct {
+		Title string
+		Description string
+		Starred bool
 	}
 
-	// task := &models.Task{} 
-	// task.CreatedAt = time.Now()
-	// utils.ParseBody(r, task)
-	// t := task.CreateTask()
-	// res, _ := json.Marshal(t)
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusOK)
-	// w.Write(res)
+	utils.ParseBody(r, taskBody)
+
+	task := &models.Task{} 
+	task.CreatedAt = time.Now()
+	task.Title = taskBody.Title
+	task.Description = taskBody.Description
+	task.Starred = taskBody.Starred
+	task.Status = "incomplete"
+
+	t, _ := task.CreateTask()
+	res, _ := json.Marshal(t)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
 
 // HTTP ERROR 405 - can be solved if a proper request is sent
@@ -116,6 +124,7 @@ func DeleteTaskByID(w http.ResponseWriter, r *http.Request){
 	}
 	if error != nil{
 		fmt.Println("Getting err while deleting", error)
+		log.Fatal("Error deleting task")
 		panic(error.Error())
 	}
 }

@@ -15,8 +15,8 @@ var db *gorm.DB
 
 type User struct{
 	gorm.Model // by default includes ID, CreatedAt, DeletedAt and UpdatedAt fields
-	Username string `json:"username"` 
-	Password string `json:"-"`
+	Username string `json:"username" gorm:"unique"` 
+	Password string `json:"-" gorm:"unique"`
 	Tasks []Task `json:"tasks"` // Foreign key
 }
 
@@ -37,16 +37,28 @@ func init(){
 	db.AutoMigrate(&User{})
 }
 
+func (u *User) CreateUser() (*User, *gorm.DB){
+	db.NewRecord(u)
+	db.Create(&u)
+	return u, db
+}
+
 func GetAllUsers() []User{
 	var Users []User
 	db.Find(&Users)
 	return Users
-}
+} 
 
-func (t *Task) CreateTask() *Task{
+// func GetUser() (*User, *gorm.DB){
+// 	var user User
+// 	db.First(&user, "email = ?", )
+// 	return user, db
+// }
+
+func (t *Task) CreateTask() (*Task, *gorm.DB){
 	db.NewRecord(t)
 	db.Create(&t)
-	return t
+	return t, db
 }
 
 func GetAllTasks(UserId int64) []Task{

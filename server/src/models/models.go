@@ -31,7 +31,7 @@ type Task struct{ // for the values which allow null, we use omitempty
 }
 
 func init(){
-	config.Connect()
+	config.ConnectDB()
 	db = config.GetDB()
 	db.AutoMigrate(&Task{})
 	db.AutoMigrate(&User{})

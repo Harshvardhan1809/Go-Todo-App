@@ -4,9 +4,9 @@ import App from './App'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CssBaseline } from '@mui/material';
-import { QueryClient, QueryClientProvider, } from 'react-query';
+import { QueryClientProvider, } from 'react-query';
+import { queryClient } from './utils/queryClient';
 
-export const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

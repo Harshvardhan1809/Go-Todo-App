@@ -7,11 +7,6 @@ import (
 	"github.com/Harshvardhan1809/Go-Todo-App/config"
 )
 
-type Data struct {
-	Count    int
-	Msg      string
-}
-
 var (
 	store *mysqlstore.MySQLStore
 	session_name = "user_session"
@@ -19,11 +14,15 @@ var (
 )
 
 func init(){
+
 	config.ConnectSessionStore()
 	store := config.GetSessionStore();
+
+	// Include the user struct in the session
 	gob.Register(&User{})
+
+
 	session = sessions.NewSession(store, session_name)
-	
 	store.Options = &sessions.Options{
 		Domain: "192.168.102.222",
 		Path: "/",

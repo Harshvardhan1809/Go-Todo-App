@@ -19,14 +19,17 @@ const useLoginMutation = ({navigate}: Options) => {
         mutationFn: async (data: LoginFormDataType)  => { 
             const { username, password } = data;
             const body = JSON.stringify({username, password});
-            const login = await axios.post("test/auth", body, config)
+            console.log("body of login mutation ", username, password)
+            const login = await axios.post("http://localhost:9010/auth/login", body, config)
+            console.log("login print ", login)
             return login;
         },  
         onSuccess: () => {
             navigate("");
         }, 
         onError: () => {
-          navigate("");
+            console.log("Getting error for login mutation")
+            navigate("");
         }
       })
       

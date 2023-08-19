@@ -1,5 +1,6 @@
 import React from 'react'
 import useCheckSessionQuery from '../../hooks/useCheckSessionQuery'
+import { Navigate, useNavigate } from "react-router-dom"
 
 export type AuthWrapperProps = {
     children: React.ReactNode
@@ -8,11 +9,13 @@ export type AuthWrapperProps = {
 const AuthWrapper = ({children}: AuthWrapperProps) => {
 
     const checkSessionQuery = useCheckSessionQuery();
+    if(checkSessionQuery.status == "success") return <Navigate to="" />
+    if(checkSessionQuery.status == "error") return <Navigate to= "/login" />
 
     return (
-        <>
-            {children}
-        </>
+        <div>
+            {checkSessionQuery.isSuccess ? <> {children} </> : <Navigate to="/login" /> }
+        </div>
     )
 }
 

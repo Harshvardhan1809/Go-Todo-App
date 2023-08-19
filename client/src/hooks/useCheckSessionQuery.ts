@@ -6,11 +6,12 @@ const useCheckSessionQuery = () => {
     return useQuery({
         queryKey: ["auth", "session"],
         queryFn: async () => {
-            const session = await axios.get("auth/session", config);
+            const session = await axios.get("http://localhost:9010/auth/session", config);
             console.log(session);
             return session;
-        }
-    })
+        },
+    }
+    )
 } 
 
 export default useCheckSessionQuery;

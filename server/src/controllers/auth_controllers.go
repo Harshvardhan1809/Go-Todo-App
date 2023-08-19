@@ -22,20 +22,38 @@ var (
 )
 
 func CheckSession(w http.ResponseWriter, r *http.Request){
+
+	fmt.Println("Print from the controller", w);
+
+	// utils.EnableCors(&w)
+
 	store = config.GetSessionStore();
 	session, err := store.Get(r, "session-name")
 	if err != nil {
 		fmt.Println("Error - could not get a session with the name")
 	}
+
+	// check if authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		fmt.Println("cant find authentication")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	// user, ok := session.Values["data"].(*sessions.User)
 
+	// get the user from the session
+	user, _ := session.Values["data"].(*models.User)
+	res, _ := json.Marshal(user)
+
+	// return the user in the session
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
 
-func SignUp(w http.ResponseWriter, r *http.Request){
+func Signup(w http.ResponseWriter, r *http.Request){
+
+	utils.EnableCors(&w)
 
 	// Get the form data 
 	var formBody struct {
@@ -48,7 +66,10 @@ func SignUp(w http.ResponseWriter, r *http.Request){
 	var tasks []models.Task 
 	newUser.Username = formBody.Username
 	newUser.CreatedAt = time.Now()
-	
+
+	fmt.Println("Print the form body ", formBody)
+	fmt.Println("Credentials ", newUser.Username, formBody.Password)
+
 	// Hash the password 
 	hash, err := bcrypt.GenerateFromPassword([]byte(formBody.Password), 10)
 	if err != nil {
@@ -57,9 +78,13 @@ func SignUp(w http.ResponseWriter, r *http.Request){
 	newUser.Password = string(hash)
 	newUser.Tasks = tasks
 
+	fmt.Println("Credentials after hashing", newUser.Username, newUser.Password)
+
 	// Create the user
 	u, _ := newUser.CreateUser()
 	res, _ := json.Marshal(u)
+
+	fmt.Println("user ", u, res);
 
 	// Respond
 	w.Header().Set("Content-Type", "application/json")
@@ -67,62 +92,53 @@ func SignUp(w http.ResponseWriter, r *http.Request){
 	w.Write(res)
 }
 
-func LogIn(w http.ResponseWriter, r *http.Request){
+func Login(w http.ResponseWriter, r *http.Request){
+
+	utils.EnableCors(&w)
+
+	fmt.Println("In the auth controller")
 
 	// Get the email and password from the request body
 	var formBody struct {
-		Username string
-		Password string
+		Username string `json:"username,omitempty"`
+		Password string `json:"password,omitempty"`
 	}
+
+	fmt.Println("Print the request in the controller", r.Body, formBody)
 	utils.ParseBody(r, formBody)
+
+	fmt.Println("dfsfd")
 
 	// Hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(formBody.Password), 10)
 	if err != nil {
-		log.Fatal("Error hashing the password")
+		w.WriteHeader(http.StatusNotFound)	
+		return
 	}
 	formBody.Password = string(hash)
+	fmt.Println("Print the password ", formBody.Password)
 
 	// Search in DB
+	fmt.Println("In the auth controller")
 	var user models.User
-	db := config.GetDB()
+	db := config.GetDB() //  , 
 	qError := db.Where("username=?",formBody.Username).Where("password=?",formBody.Password).Find(&user)
 	if qError.Error != nil {
-		log.Fatal("Error : User does not exist")
+		fmt.Println("In the auth controller print error, ", qError.Error)
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
-	// Once user exists, we place it in the session
-	session, _ := store.Get(r, "session-name")
-	session.Values["authenticated"] = true
-	session.Save(r, w)
+	// This is giving error
+	// session, _ := store.Get(r, "session-name")
+	// fmt.Println("Printing session", session)
+	// session.Values["authenticated"] = true
+	// session.Values["user"] = user
+	// session.Save(r, w)
 
-
-	// Now that we have user, generate the token and hash it
-	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-	// 	"sub" : user.ID,
-	// 	"exp" : time.Now().Add(time.Hour * 24 * 365).Unix(),
-	// })
-	// tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
-	// if err != nil {
-	// 	log.Fatal("Error signing the token")
-	// }
 	res, _ := json.Marshal(user)
 
-	// // Set as cookie
-	// cookie := http.Cookie{
-	// 	Name: "Authorization", 
-	// 	Value: tokenString, 
-	// 	MaxAge: 3600 * 24 * 365,
-	// 	Path:  "", 
-	// 	Domain : "", 
-	// 	Secure : false,
-	// 	HttpOnly : true,
-	// }
-	// http.SetCookie(w, &cookie)
-
-	// Login in using the token
-	w.Header().Set("Content-Type", "application/json")
-	// w.Header().Set("token", tokenString)
+	// equivalent of return res.status(200).send(res)
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }

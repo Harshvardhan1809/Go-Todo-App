@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"fmt"
+	_ "fmt"
 	"encoding/json"
 	"time"
 	"log"
@@ -9,45 +9,44 @@ import (
 	_ "os"
 	"golang.org/x/crypto/bcrypt"
 	_ "github.com/golang-jwt/jwt/v4"
-	"github.com/gorilla/sessions"
-	"github.com/srinathgs/mysqlstore"
 	"github.com/Harshvardhan1809/Go-Todo-App/models"
 	"github.com/Harshvardhan1809/Go-Todo-App/config"
 	"net/http"
 )
 
-var (
-	store *mysqlstore.MySQLStore
-	session *sessions.Session
-)
+// var (
+//     // key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+//     key = []byte("super-secret-key")
+//     store = sessions.NewCookieStore(key)
+// )
 
-func CheckSession(w http.ResponseWriter, r *http.Request){
+// func CheckSession(w http.ResponseWriter, r *http.Request){
 
-	fmt.Println("Print from the controller", w);
+// 	fmt.Println("Print from the controller", w);
 
-	store = config.GetSessionStore();
-	session, err := store.Get(r, "session-name")
-	if err != nil {
-		fmt.Println("Error - could not get a session with the name")
-	}
+// 	store = config.GetSessionStore();
+// 	session, err := store.Get(r, "session-name")
+// 	if err != nil {
+// 		fmt.Println("Error - could not get a session with the name")
+// 	}
 
-	// check if authenticated
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+// 	// check if authenticated
+// 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+// 		w.Header().Set("Content-Type", "application/json")
+// 		w.WriteHeader(http.StatusNotFound)
+// 		return
+// 	}
 
-	// get the user from the session
-	user, _ := session.Values["data"].(*models.User)
-	res, _ := json.Marshal(user)
+// 	// get the user from the session
+// 	user, _ := session.Values["data"].(*models.User)
+// 	res, _ := json.Marshal(user)
 
-	// return the user in the session
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
-}
+// 	// return the user in the session
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Header().Set("Access-Control-Allow-Origin", "*")
+// 	w.WriteHeader(http.StatusOK)
+// 	w.Write(res)
+// }
 
 func Signup(w http.ResponseWriter, r *http.Request){
 
@@ -119,12 +118,17 @@ func Login(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// This is giving error
+	// CHECK AND SAVE SESSION
+	// store := config.GetSessionStore(); 
+	// fmt.Println("Got store in the controller")
 	// session, _ := store.Get(r, "session-name")
-	// fmt.Println("Printing session", session)
-	// session.Values["authenticated"] = true
-	// session.Values["user"] = user
-	// session.Save(r, w)
+	// session.Values["user"] = formBody;
+	// session.Values["authenticated"] = true	
+	// sessErr := session.Save(r, w)
+	// if sessErr != nil {
+	// 	http.Error(w, sessErr.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	// WRITE TO RESPONSE
 	w.Header().Set("Content-Type", "application/json")

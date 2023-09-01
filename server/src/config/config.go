@@ -1,7 +1,7 @@
 package config 
 
 import (
-	"os"
+ 	"os"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -32,6 +32,7 @@ func ConnectSessionStore(){
 		fmt.Println("Error in connecting session store")
 		panic(err)
 	}
+	fmt.Println("Connected to session store")
 	store = s
 }
 

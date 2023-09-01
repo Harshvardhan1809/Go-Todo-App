@@ -21,7 +21,7 @@ const Home = () => {
 
     return (
         <main>
-            <Box sx={{ backgroundImage: `url(${GridPatternRepeatImage})`, backgroundPosition: "center", backgroundSize: "20%", backgroundRepeat: "round" }}>
+            <Box sx={{ backgroundImage: `url(${GridPatternRepeatImage})`, backgroundPosition: "center", backgroundSize: "20%", backgroundRepeat: "repeat" }}>
                 <Navbar/>
                 <Container maxWidth="sm" sx={{"text-align": "center", "margin-top": "25px"}}>
                     <Typography variant="h4" gutterBottom>TODO App</Typography>

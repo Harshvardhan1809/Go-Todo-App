@@ -3,6 +3,9 @@ import TodoList from "../components/Home/Todolist"
 import ModalForm from "../components/Home/ModalForm"
 import { Container, Typography } from "@mui/material";
 import Navbar from "../components/general/Navbar"; 
+import { Box } from "@mui/system";
+import GridPatternRepeatImage from "./../assets/gridRepeat.jpg"
+import GridInvertedPatternRepeatImage from "./../assets/gridRepeatInvertedPatten.jpg" // b/w image
 
 const Home = () => {
 
@@ -18,7 +21,7 @@ const Home = () => {
 
     return (
         <main>
-            <div>
+            <Box sx={{ backgroundImage: `url(${GridPatternRepeatImage})`, backgroundPosition: "center", backgroundSize: "20%", backgroundRepeat: "round" }}>
                 <Navbar/>
                 <Container maxWidth="sm" sx={{"text-align": "center", "margin-top": "25px"}}>
                     <Typography variant="h4" gutterBottom>TODO App</Typography>
@@ -28,7 +31,7 @@ const Home = () => {
                     <TodoList modalOpen={handleOpen}/>
                     <ModalForm open={modalOpen} handleClose={handleClose}/>
                 </Container>
-            </div>
+            </Box>
         </main>
     )
 }

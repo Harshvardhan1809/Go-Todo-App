@@ -1,11 +1,16 @@
 import { Fragment } from 'react';
-import { AppBar, CssBaseline, Typography, Button } from '@mui/material';
+import { AppBar, CssBaseline, Typography, Button, IconButton} from '@mui/material';
 import { Box } from '@mui/system';
 import ChecklistIcon from '@mui/icons-material/Checklist';
+import Brightness6Icon from '@mui/icons-material/Brightness6';
 
 // Using Box component from MUI System as a wrapper to give styling to MUI Material components
 
 const Navbar = () => {
+
+    const handleLightDarkModeChange = () => {
+        return;
+    }
 
     return (
         <Fragment>
@@ -25,6 +30,11 @@ const Navbar = () => {
                             </Box>
                             <Box sx={{"padding-left": "10px"}}>
                                 <Button variant="contained" color="success">Logout</Button>
+                            </Box>
+                            <Box sx={{"padding-left": "10px"}}>
+                                <IconButton onClick={handleLightDarkModeChange}>
+                                    <Brightness6Icon/>
+                                </IconButton>
                             </Box>
                         </Box>
                     </Box>

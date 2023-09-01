@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"time"
 	"log"
+	"io"
+	"bytes"
 	_ "os"
 	"golang.org/x/crypto/bcrypt"
 	_ "github.com/golang-jwt/jwt/v4"
@@ -54,6 +56,8 @@ func CheckSession(w http.ResponseWriter, r *http.Request){
 func Signup(w http.ResponseWriter, r *http.Request){
 
 	utils.EnableCors(&w)
+	fmt.Println("Print request body in signup ", r.Body)
+	fmt.Println(" ")
 
 	// Get the form data 
 	var formBody struct {
@@ -94,8 +98,6 @@ func Signup(w http.ResponseWriter, r *http.Request){
 
 func Login(w http.ResponseWriter, r *http.Request){
 
-	utils.EnableCors(&w)
-
 	fmt.Println("In the auth controller")
 
 	// Get the email and password from the request body
@@ -103,11 +105,16 @@ func Login(w http.ResponseWriter, r *http.Request){
 		Username string `json:"username,omitempty"`
 		Password string `json:"password,omitempty"`
 	}
+	// fmt.Println("Print the request in the controller", r.Body, formBody)
+	// utils.ParseBody(r, formBody)
 
-	fmt.Println("Print the request in the controller", r.Body, formBody)
-	utils.ParseBody(r, formBody)
+	bufOfRequestBody, _ := io.ReadAll(r.Body)
+	fmt.Println("print the request body ", bufOfRequestBody);
+	// [For Request Body] 消費されてしまったRequest Bodyを修復する
+	r.Body = io.NopCloser(bytes.NewBuffer(bufOfRequestBody))
 
-	fmt.Println("dfsfd")
+	fmt.Println("bufOfRequestBody : ", bytes.NewBuffer(bufOfRequestBody))
+	fmt.Println("r.Body : ", r.Body)
 
 	// Hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(formBody.Password), 10)
@@ -115,16 +122,17 @@ func Login(w http.ResponseWriter, r *http.Request){
 		w.WriteHeader(http.StatusNotFound)	
 		return
 	}
+
 	formBody.Password = string(hash)
+	// [For Request Body] 消費されてしまったRequest Bodyを修復する
+	r.Body = io.NopCloser(bytes.NewBuffer(bufOfRequestBody))
 	fmt.Println("Print the password ", formBody.Password)
 
 	// Search in DB
-	fmt.Println("In the auth controller")
 	var user models.User
 	db := config.GetDB() //  , 
 	qError := db.Where("username=?",formBody.Username).Where("password=?",formBody.Password).Find(&user)
 	if qError.Error != nil {
-		fmt.Println("In the auth controller print error, ", qError.Error)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -138,7 +146,6 @@ func Login(w http.ResponseWriter, r *http.Request){
 
 	res, _ := json.Marshal(user)
 
-	// equivalent of return res.status(200).send(res)
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }

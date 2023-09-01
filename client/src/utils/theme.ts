@@ -1,8 +1,29 @@
-import { createTheme } from "@mui/material/styles";
+import {createTheme } from "@mui/material/styles";
+import { useState, useMemo, createContext } from "react";
 
-const theme = createTheme({
+// if want to extends the theme interface, can do it here
+// declare module '@mui/material/styles' {
+//     interface Theme {
+//       status: {
+//         danger: string;
+//       };
+//     }
+// }
+
+export const theme = createTheme({
     palette: {
     },
 });
 
-export default theme;
+// through the context we pass the function to toggle the color
+// export const ColorModeContext = createContext({
+//   toggleColorMode: () => {},
+// })
+
+// export const useMode = () => {
+//   const [mode, setMode] = useState("dark");
+
+//   const colorMode = useMemo(
+//     () => 
+//   )
+// }

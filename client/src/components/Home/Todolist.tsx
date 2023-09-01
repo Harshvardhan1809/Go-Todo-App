@@ -16,7 +16,7 @@ const TodoList = (props: { modalOpen : () => void }) => {
 
     return (
         <Fragment>
-            <Card sx={{width: 800, "margin": "auto", "margin-top": "15px"}}>
+            <Card sx={{width: 800, "margin": "auto", "margin-top": "15px", "padding-top": "30px"}}>
 
                 <Box sx={{"display": "flex", "justify-content": "center"}}>
                     {/* <CardHeader title="Tasks for today, 29/05/2023" sx={{"text-align": "center"}}/>

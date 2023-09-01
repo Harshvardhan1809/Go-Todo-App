@@ -14,9 +14,7 @@ const App: React.FC = React.memo(() => {
                         <Route path="/login" element={<LoginContainer />} />
                         <Route path="/signup" element={<SignupContainer />} />
                         <Route path="" element={
-                            <AuthWrapper>
                                 <Home/>
-                            </AuthWrapper>
                         }/>
                     </Routes>
                 </Router>
@@ -25,5 +23,7 @@ const App: React.FC = React.memo(() => {
 })
 
 export default App;
+//<AuthWrapper>                            </AuthWrapper>
+
 
 // Navbar, hero area (with a background design and the todo section) 

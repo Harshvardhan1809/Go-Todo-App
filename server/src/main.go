@@ -18,6 +18,8 @@ func init(){
 	// use ENV variables using os.Getenv()
 }
 
+// To use Air for live reloading : alias air="$(go env GOPATH)"/bin/air
+
 func main(){
 
 	r := mux.NewRouter();
@@ -28,7 +30,7 @@ func main(){
 	port := os.Getenv("PORT")
 	url := "localhost:" + port 
 
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"});
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization","Access-Control-Allow-Origin"});
 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"});
 	originsOk := handlers.AllowedOrigins([]string{"*"});
 

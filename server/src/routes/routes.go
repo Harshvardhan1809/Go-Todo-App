@@ -32,8 +32,9 @@ var TodoAppRoutes = func(router *mux.Router){
 
 	router.HandleFunc("/auth/signup", controllers.Signup).Methods("POST")
 	router.HandleFunc("/auth/login", controllers.Login).Methods("POST")
+	router.HandleFunc("/auth/logout", controllers.Logout).Methods("POST")
 	// router.HandleFunc("/auth/validate", middleware.RequireAuth).Methods("GET")
-	router.HandleFunc("auth/session", controllers.CheckSession).Methods("GET")
+	router.HandleFunc("/auth/session", controllers.CheckSession).Methods("GET")
 
 	fmt.Println("Didn't match any route lol")
 }

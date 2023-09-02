@@ -7,9 +7,16 @@ const useCheckSessionQuery = () => {
         queryKey: ["auth", "session"],
         queryFn: async () => {
             const session = await axios.get("http://localhost:9010/auth/session", config);
+            console.log("In check session query")
             console.log(session);
             return session;
         },
+        onSuccess: (data) => {
+            console.log("Successfully checked sessions", data)
+        },
+        onError: (error) => {
+            console.log("Error checking sessions", error)
+        } 
     }
     )
 } 

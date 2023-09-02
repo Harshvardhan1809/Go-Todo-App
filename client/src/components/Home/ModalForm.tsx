@@ -2,20 +2,19 @@ import React, { Fragment } from "react";
 import { Dialog, TextField, styled, Button, Typography, Box } from "@mui/material";
 import CreateIcon from '@mui/icons-material/Create';
 import StarIcon from '@mui/icons-material/Star';
-import theme from "../../utils/theme"
 import { DatePicker } from "@mui/x-date-pickers";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 // attempt to reduce the inline CSS
 // can't use makeStyles since it is depreacted (@mui/styles)
 // hence styled components
 
-const StyledTextField = styled(TextField)(({theme}) => ({
+const StyledTextField = styled(TextField)(({}) => ({
     margin: "1rem",
     width: "350px",
 }))
 
-const StyledForm = styled('form')(({theme}) => ({
+const StyledForm = styled('form')(({}) => ({
     display: "flex",
     flexDirection : "column",
     justifyContent: "center",
@@ -24,7 +23,7 @@ const StyledForm = styled('form')(({theme}) => ({
     margin: "25 px 0px 20px 0px"
 }))
 
-const StyledButtonDiv = styled('div')(({theme}) => ({
+const StyledButtonDiv = styled('div')(({}) => ({
     width: "100%", 
     display: "flex",
     flexDirection:"row", 
@@ -32,7 +31,7 @@ const StyledButtonDiv = styled('div')(({theme}) => ({
     margin: "10px auto 20px auto",
 }))
 
-const StyledImportantField = styled(Typography)(({theme}) => ({
+const StyledImportantField = styled(Typography)(({}) => ({
     margin : "22.5px 15px 22.5px 15px", 
     color : "gray", 
     fontSize : "1rem"

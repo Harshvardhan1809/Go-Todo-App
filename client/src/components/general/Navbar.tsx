@@ -3,6 +3,9 @@ import { AppBar, CssBaseline, Typography, Button, IconButton} from '@mui/materia
 import { Box } from '@mui/system';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
+import useLogoutMutation from '../../hooks/useLogoutMutation';
+import useCheckSessionQuery from "../../hooks/useCheckSessionQuery"
+import { useNavigate } from 'react-router-dom';
 
 // Using Box component from MUI System as a wrapper to give styling to MUI Material components
 
@@ -11,6 +14,15 @@ const Navbar = () => {
     const handleLightDarkModeChange = () => {
         return;
     }
+    const navigate = useNavigate();
+
+    // DO A QUERY AND GET USER NAME
+    const { data: sessionData, isLoading: sessionIsLoading, isSuccess: sessionIsSuccess, isError: sessionIsError } = useCheckSessionQuery();
+    console.log("Print the session data", sessionData)
+    const name: string = "harsh" // JSON.parse(sessionData?.data)["name"];
+    console.log(name)
+
+    const logoutMutation = useLogoutMutation({navigate});
 
     return (
         <Fragment>
@@ -20,18 +32,18 @@ const Navbar = () => {
                         <Box sx={{ 'padding': '15px 10px 10px 15px',  }}>
                             <ChecklistIcon />
                         </Box>
-                        <Box sx={{ 'padding-top': '10px', 'padding-left': '15px' }}>
+                        <Box sx={{ 'paddingTop': '10px', 'paddingLeft': '15px' }}>
                             <Typography variant="h6">TODO</Typography>
                         </Box>
 
-                        <Box sx={{"display":"flex", "padding-top": "10px", "margin-left": "auto", "margin-right": "10px"}}>
-                            <Box sx={{ "padding-left": "10px", "padding-top": "2.5px"}}>
+                        <Box sx={{"display":"flex", "paddingTop": "10px", "marginLeft": "auto", "marginRight": "10px"}}>
+                            <Box sx={{ "paddingLeft": "10px", "paddingTop": "2.5px"}}>
                                 <Typography variant="h6">Harsh</Typography>
                             </Box>
-                            <Box sx={{"padding-left": "10px"}}>
-                                <Button variant="contained" color="success">Logout</Button>
+                            <Box sx={{"paddingLeft": "10px"}}>
+                                <Button variant="contained" color="success" onClick={() => logoutMutation.mutate({username: name})}>Logout</Button>
                             </Box>
-                            <Box sx={{"padding-left": "10px"}}>
+                            <Box sx={{"paddingLeft": "10px"}}>
                                 <IconButton onClick={handleLightDarkModeChange}>
                                     <Brightness6Icon/>
                                 </IconButton>

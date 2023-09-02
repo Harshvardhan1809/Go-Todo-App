@@ -1,12 +1,5 @@
 package models
 
-import (
-	_ "encoding/gob"
-	_ "github.com/gorilla/sessions"
-	_ "github.com/srinathgs/mysqlstore"
-	_ "github.com/Harshvardhan1809/Go-Todo-App/config"
-	_ "fmt"
-)
 
 // var (
 // 	store *mysqlstore.MySQLStore

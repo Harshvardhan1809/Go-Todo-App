@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	_ "fmt"
+	"fmt"
 	"encoding/json"
 	"time"
 	"log"
@@ -11,42 +11,53 @@ import (
 	_ "github.com/golang-jwt/jwt/v4"
 	"github.com/Harshvardhan1809/Go-Todo-App/models"
 	"github.com/Harshvardhan1809/Go-Todo-App/config"
+	"github.com/gorilla/sessions"
 	"net/http"
 )
 
-// var (
-//     // key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
-//     key = []byte("super-secret-key")
-//     store = sessions.NewCookieStore(key)
-// )
+var (
+    // key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+    key = []byte("super-secret-key")
+    store = sessions.NewCookieStore(key)
+)
 
-// func CheckSession(w http.ResponseWriter, r *http.Request){
+func CheckSession(w http.ResponseWriter, r *http.Request){
 
-// 	fmt.Println("Print from the controller", w);
+	// store.GET creates a new session every time smh, we need cookie information from the mf request
+	session, _ := store.Get(r, "session-name")
+	fmt.Println("Print session in check session ", session.Values)
 
-// 	store = config.GetSessionStore();
-// 	session, err := store.Get(r, "session-name")
-// 	if err != nil {
-// 		fmt.Println("Error - could not get a session with the name")
-// 	}
+	// CHECK IF THE USER EXISTS IN SESSION
+	if session.Values["username"] != "" {
+		fmt.Println("Get user from DB ", session.Values["username"])
+		var user models.User
+		db := config.GetDB()
+		qError := db.Where("username=?", session.Values["username"]).Find(&user)
+		if qError.Error != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		res, _ := json.Marshal(user)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+	}
 
-// 	// check if authenticated
-// 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-// 		w.Header().Set("Content-Type", "application/json")
-// 		w.WriteHeader(http.StatusNotFound)
-// 		return
-// 	}
+	// USER NOT FOUND, ERROR
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+	return
 
-// 	// get the user from the session
-// 	user, _ := session.Values["data"].(*models.User)
-// 	res, _ := json.Marshal(user)
+	// check if authenticated
+	// if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	w.WriteHeader(http.StatusNotFound)
+	// 	return
+	// }
 
-// 	// return the user in the session
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Header().Set("Access-Control-Allow-Origin", "*")
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Write(res)
-// }
+}
 
 func Signup(w http.ResponseWriter, r *http.Request){
 
@@ -118,21 +129,51 @@ func Login(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// CHECK AND SAVE SESSION
-	// store := config.GetSessionStore(); 
-	// fmt.Println("Got store in the controller")
-	// session, _ := store.Get(r, "session-name")
-	// session.Values["user"] = formBody;
-	// session.Values["authenticated"] = true	
-	// sessErr := session.Save(r, w)
-	// if sessErr != nil {
-	// 	http.Error(w, sessErr.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
+	// CHECK SESSION
+	session, _ := store.Get(r, "session-name")
+	session.Values["username"] = formBody.Username
+	session.Values["authenticated"] = true
+	fmt.Println("Print the session values ", session.Values)
+	fmt.Println("Print the session username ", session.Values["username"])
+	fmt.Println("Print the session options ", session.Options.MaxAge)
+	// delete cookie session.Options.MaxAge = -1;
+	sessErr := session.Save(r, w)
+	if sessErr != nil {
+		http.Error(w, sessErr.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	// WRITE TO RESPONSE
 	w.Header().Set("Content-Type", "application/json")
 	res, _ := json.Marshal(user)
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
+}
+
+func Logout (w http.ResponseWriter, r *http.Request) {
+
+	// GET THE USERNAME FROM THE REQ BODY
+	// io.ReadCloser -> []byte array -> string -> struct
+	var logoutBody struct {
+		Username string `json:"username,omitempty"`
+	}
+	bufOfRequestBody, _ := io.ReadAll(r.Body)
+	stringRequestBody := string(bufOfRequestBody)
+	json.Unmarshal([]byte(stringRequestBody), &logoutBody);
+
+	// CHECK SESSION AND RETURN 200
+	session, _ := store.Get(r, "session-name")
+	if session.Values["username"] == logoutBody.Username {
+		session.Options.MaxAge = -1;
+		session.Options.SameSite = http.SameSiteLaxMode;
+		session.Options.HttpOnly = true;
+		session.Save(r, w);
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+	}
+
+	// IF NO MATCH THEN RETURN 400 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+	return
 }

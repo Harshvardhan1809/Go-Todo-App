@@ -30,10 +30,12 @@ func main(){
 	port := os.Getenv("PORT")
 	url := "localhost:" + port 
 
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization","Access-Control-Allow-Origin"});
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization","Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"});
 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"});
-	originsOk := handlers.AllowedOrigins([]string{"*"});
+	originsOk := handlers.AllowedOrigins([]string{"http://127.0.0.1:5173"});
+	credentialsOk := handlers.AllowCredentials();
+	exposedHeaders := handlers.ExposedHeaders([]string{"Set-Cookie"});
 
-	log.Fatal(http.ListenAndServe(url, handlers.CORS(headersOk, methodsOk, originsOk)(r)))
+	log.Fatal(http.ListenAndServe(url, handlers.CORS(headersOk, methodsOk, originsOk, credentialsOk, exposedHeaders)(r)))
 
 } 

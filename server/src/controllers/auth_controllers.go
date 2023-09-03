@@ -11,20 +11,21 @@ import (
 	_ "github.com/golang-jwt/jwt/v4"
 	"github.com/Harshvardhan1809/Go-Todo-App/models"
 	"github.com/Harshvardhan1809/Go-Todo-App/config"
-	"github.com/gorilla/sessions"
+	_ "github.com/gorilla/sessions"
 	"net/http"
 )
 
-var (
-    // key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
-    key = []byte("super-secret-key")
-    store = sessions.NewCookieStore(key)
-)
+// var (
+//     // key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+//     key = []byte("super-secret-key")
+//     store = sessions.NewCookieStore(key)
+// )
 
 func CheckSession(w http.ResponseWriter, r *http.Request){
 
 	// store.GET creates a new session every time smh, we need cookie information from the mf request
-	session, _ := store.Get(r, "session-name")
+	store := config.GetSessionStore();
+	session, _ := store.Get(r, "k")
 	fmt.Println("Print session in check session ", session.Values)
 
 	// CHECK IF THE USER EXISTS IN SESSION
@@ -130,22 +131,37 @@ func Login(w http.ResponseWriter, r *http.Request){
 	}
 
 	// CHECK SESSION
-	session, _ := store.Get(r, "session-name")
+	store := config.GetSessionStore();
+	session, getErr := store.Get(r, formBody.Username)
+	if getErr != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	fmt.Println("In the login controller")
 	session.Values["username"] = formBody.Username
 	session.Values["authenticated"] = true
 	fmt.Println("Print the session values ", session.Values)
 	fmt.Println("Print the session username ", session.Values["username"])
 	fmt.Println("Print the session options ", session.Options.MaxAge)
-	// delete cookie session.Options.MaxAge = -1;
-	sessErr := session.Save(r, w)
+	fmt.Println("Print the session name ", session.Name())
+	session.Options.SameSite = http.SameSiteLaxMode;
+	session.Options.HttpOnly = false;
+	session.Options.Path = "/";
+	session.Options.MaxAge = 60*60*3; //3hrs
+	sessErr := session.Save(r, w) // saves this session in the store
 	if sessErr != nil {
+		fmt.Println("Can't store session in store")
 		http.Error(w, sessErr.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// ONLY THING REMAINING IS SENDING THE 
+
 	// WRITE TO RESPONSE
 	w.Header().Set("Content-Type", "application/json")
 	res, _ := json.Marshal(user)
+	fmt.Println("Print the response", string(res))
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -162,11 +178,10 @@ func Logout (w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal([]byte(stringRequestBody), &logoutBody);
 
 	// CHECK SESSION AND RETURN 200
+	store := config.GetSessionStore();
 	session, _ := store.Get(r, "session-name")
 	if session.Values["username"] == logoutBody.Username {
 		session.Options.MaxAge = -1;
-		session.Options.SameSite = http.SameSiteLaxMode;
-		session.Options.HttpOnly = true;
 		session.Save(r, w);
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

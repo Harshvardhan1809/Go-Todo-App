@@ -19,6 +19,7 @@ func ConnectDB(){
 		fmt.Println("Error while opening database")
 		// panic(err)
 	}
+	fmt.Println("Connected to database")
 	db = d
 }
 
@@ -30,7 +31,6 @@ func ConnectSessionStore(){
 	s, err := mysqlstore.NewMySQLStore("root:MySQL@root@password@2002@/golang_api?charset=utf8&parseTime=True&loc=Local", "sessions", "/", 3600, []byte(os.Getenv("SECRET")))
 	if err != nil {
 		fmt.Println("Error in connecting session store")
-		panic(err)
 	}
 	fmt.Println("Connected to session store")
 	store = s

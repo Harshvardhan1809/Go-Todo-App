@@ -22,10 +22,7 @@ type Claims struct {
 
 type Middleware func(http.HandlerFunc) http.HandlerFunc
 
-// checks for jwt token in the response
 func RequireAuth(w http.ResponseWriter, r *http.Request){
-
-	//fmt.Println("In auth middleware")
 
 	// Get the cookies from request
 	t, err := r.Cookie("token")
@@ -82,8 +79,6 @@ func RequireAuth(w http.ResponseWriter, r *http.Request){
 func CheckSessionMiddleware (f http.HandlerFunc) http.HandlerFunc { 
 	
 	return func(w http.ResponseWriter, r *http.Request){
-
-		//fmt.Println("In check session middleware")
 
 		// Get the cookies from request
 		t, err := r.Cookie("token")

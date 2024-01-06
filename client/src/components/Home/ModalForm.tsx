@@ -2,7 +2,6 @@ import React, { type BaseSyntheticEvent, Fragment, useState, useMemo } from "rea
 import { Dialog, TextField, styled, Button, Typography, Box } from "@mui/material";
 import CreateIcon from '@mui/icons-material/Create';
 import StarIcon from '@mui/icons-material/Star';
-import theme from "../../utils/theme"
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { type Dayjs } from 'dayjs';
 import useCreateTaskMutation from "../../hooks/useCreateTaskMutation";

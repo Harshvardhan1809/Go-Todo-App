@@ -6,7 +6,6 @@ import Navbar from "../components/general/Navbar";
 import { Box } from "@mui/system";
 import GridPatternRepeatImage from "./../assets/gridRepeat.jpg"
 import GridInvertedPatternRepeatImage from "./../assets/gridRepeatInvertedPatten.jpg" // b/w image
-import useCheckSessionQuery from "../hooks/useCheckSessionQuery";
 import 'dayjs/locale/ja';
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs, {type Dayjs} from 'dayjs';

@@ -21,8 +21,6 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-var apiErr utils.APIError;
-
 func Signup(w http.ResponseWriter, r *http.Request) {
 
 	// STRUCT FOR THE FORM BODY
@@ -54,6 +52,13 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	// CREATE THE USER
 	u, _ := newUser.CreateUser()
 	res, _ := json.Marshal(u)
+
+	// EXPIRE THE COOKIE, WRITE TO RESPONSE
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Expires: time.Now(),
+	})
+	w.WriteHeader(http.StatusOK)
 
 	// WRITE TO RESPONSE
 	w.Header().Set("Content-Type", "application/json")

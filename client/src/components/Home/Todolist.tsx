@@ -7,7 +7,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ButtonBase from '@mui/material/ButtonBase';
 import { DatePicker } from "@mui/x-date-pickers";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 const TodoList = (props: { modalOpen : () => void }) => {
     
@@ -19,10 +19,6 @@ const TodoList = (props: { modalOpen : () => void }) => {
             <Card sx={{width: 800, "margin": "auto", "margin-top": "15px", "padding-top": "30px"}}>
 
                 <Box sx={{"display": "flex", "justify-content": "center"}}>
-                    {/* <CardHeader title="Tasks for today, 29/05/2023" sx={{"text-align": "center"}}/>
-                    <Button>
-                        <CalendarMonthIcon sx={{"margin": "0px 0px 0px 5px"}}/>
-                    </Button> */}
                     <CardHeader title="Tasks for " sx={{"text-align": "center"}}/>
                     <DatePicker/>
                 </Box>
@@ -37,7 +33,7 @@ const TodoList = (props: { modalOpen : () => void }) => {
                 </Box>
                 <CardContent>
 
-                    <Box sx={{"margin": "0px 50px 10px 50px", "display": "flex", "border": "solid", "border-radius": "5px","border-width": "1px", "border-color": "gray", "padding": "7.5px 10px 7.5px 20px"}}>
+                    {/* <Box sx={{"margin": "0px 50px 10px 50px", "display": "flex", "border": "solid", "border-radius": "5px","border-width": "1px", "border-color": "gray", "padding": "7.5px 10px 7.5px 20px"}}>
                         <Tooltip title="Done">
                             <RadioButtonUncheckedIcon sx={{"margin": "5px 20px auto 0px"}}/>
                         </Tooltip>
@@ -52,9 +48,9 @@ const TodoList = (props: { modalOpen : () => void }) => {
                             <Button variant="contained">DONE</Button>
                             <Button variant="contained" color="error" sx={{"margin": "0px 0px 0px 10px"}}>DELETE</Button>
                         </Box>
-                    </Box>
+                    </Box> */}
 
-                    <Box sx={{"margin": "0px 50px 10px 50px", "display": "flex", "border": "solid", "border-radius": "5px","border-width": "1px", "border-color": "gray", "padding": "7.5px 10px 7.5px 20px"}}>
+                    {/* <Box sx={{"margin": "0px 50px 10px 50px", "display": "flex", "border": "solid", "border-radius": "5px","border-width": "1px", "border-color": "gray", "padding": "7.5px 10px 7.5px 20px"}}>
                         <Tooltip title="Done">
                             <RadioButtonUncheckedIcon sx={{"margin": "5px 20px auto 0px"}}/>
                         </Tooltip>                        
@@ -69,14 +65,14 @@ const TodoList = (props: { modalOpen : () => void }) => {
                             <Button variant="contained">DONE</Button>
                             <Button variant="contained" color="error" sx={{"margin": "0px 0px 0px 10px"}}>DELETE</Button>                      
                         </Box>
-                    </Box>
+                    </Box> */}
 
                 </CardContent>
                 
                 <Typography sx={{"margin": "0px 50px 0px 75px", "color": "green"}} variant="h6">COMPLETED</Typography>
                 <CardContent>
 
-                    <Box sx={{"margin": "0px 50px 10px 50px", "display": "flex", "border": "solid", "border-radius": "5px","border-width": "1px", "border-color": "gray", "padding": "7.5px 10px 7.5px 20px"}}>
+                    {/* <Box sx={{"margin": "0px 50px 10px 50px", "display": "flex", "border": "solid", "border-radius": "5px","border-width": "1px", "border-color": "gray", "padding": "7.5px 10px 7.5px 20px"}}>
                         <Tooltip title="Undo">
                             <CheckCircleIcon sx={{"margin": "5px 20px auto 0px"}}/>
                         </Tooltip>
@@ -87,7 +83,7 @@ const TodoList = (props: { modalOpen : () => void }) => {
                         <Box sx={{"display": "flex", "margin-left": "auto"}}>
                             <StarIcon sx={{"margin": "auto 15px auto 0px"}}/>
                         </Box>
-                    </Box>
+                    </Box> */}
                     <Typography sx={{"color": "black"}}>displays completed tasks from today, can't clear but automatically disappears in 24 hours</Typography>
 
                 </CardContent>
@@ -95,7 +91,7 @@ const TodoList = (props: { modalOpen : () => void }) => {
                 <Typography sx={{"margin": "0px 50px 0px 75px", "color": "gray"}} variant="h6">PREVIOUS TASKS</Typography>
                 <CardContent>
 
-                    <Box sx={{"margin": "0px 50px 10px 50px", "display": "flex", "border": "solid", "border-radius": "5px","border-width": "1px", "border-color": "gray", "padding": "7.5px 10px 7.5px 20px"}}>
+                    {/* <Box sx={{"margin": "0px 50px 10px 50px", "display": "flex", "border": "solid", "border-radius": "5px","border-width": "1px", "border-color": "gray", "padding": "7.5px 10px 7.5px 20px"}}>
                         <Tooltip title="Done">
                             <RadioButtonUncheckedIcon sx={{"margin": "5px 20px auto 0px"}}/>
                         </Tooltip>
@@ -111,7 +107,7 @@ const TodoList = (props: { modalOpen : () => void }) => {
                             <Button variant="contained">DONE</Button>
                             <Button variant="contained" color="error" sx={{"margin": "0px 0px 0px 10px"}}>DELETE</Button>                 
                         </Box>
-                    </Box>
+                    </Box> */}
                     <Typography sx={{"color": "black"}}>view more (fetches 5 more incomplete tasks, currently seeing tasks from yesterday and the day before yesterday)</Typography>
                 </CardContent>
 

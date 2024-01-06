@@ -1,5 +1,6 @@
 server/bin/*
 server/pkg/*
 server/tmp/*
+server/src/.env
 client/node_modules/*
 client/.vite/*

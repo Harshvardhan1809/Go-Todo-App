@@ -4,8 +4,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/Harshvardhan1809/Go-Todo-App/config"
 	"time"
-	"fmt"
-	"reflect"
 )
 
 var db *gorm.DB
@@ -22,11 +20,11 @@ type User struct{
 
 type Task struct{ // for the values which allow null, we use omitempty
 	gorm.Model
-	UserID uint `json:"userId"` // foreign key
-	CompletedAt time.Time `json:"completedAt,omitempty" `
-	Title string `json:"name"`
-	Description string `json:"description,omitempty"`
-	Status string `json:"status,omitempty"`
+	UserID uint `json:"user_id"` // foreign key
+	CompletedAt time.Time `json:"completedAt,omitempty" gorm:"default:NULL"`
+	Title string `json:"title"`
+	Description string `json:"description"`
+	Status string `json:"status" gorm:"default:incomplete"`
 	Starred bool `json:"starred,omitempty"`
 }
 
@@ -71,7 +69,7 @@ func GetAllTasks(UserId int64) []Task{
 func GetTaskByID(Id int64) (*Task, *gorm.DB){
 	var getTask Task
 	db := db.Where("ID=?", Id).Find(&getTask)
-	fmt.Println("Printing the task we got", getTask, getTask.CreatedAt, reflect.TypeOf(getTask.CreatedAt))
+	//fmt.Println("Printing the task we got", getTask, getTask.CreatedAt, reflect.TypeOf(getTask.CreatedAt))
 	return &getTask, db
 }
 
@@ -84,19 +82,21 @@ func DeleteTaskByID(Id int64) Task{
 }
 
 // Problem -> getting task even when a date is specified
-func GetTaskByDate(UserId int64, d time.Time) []Task{	
-
+func GetTaskByDate(d time.Time) []Task{	
 	var Tasks []Task
-	db.Where("created_at is null").Find(&Tasks)
-
+	db.Where("created_at=?", d).Find(&Tasks)
 	return Tasks
+}
 
+func GetTaskByUserIDDate(UserId int64, d1 time.Time, d2 time.Time) []Task{	
+	var Tasks []Task
+	db.Where("user_id=?", UserId).Where("created_at BETWEEN ? AND ?", d1, d2).Find(&Tasks) 
+	// .Where("created_at=?", d)
+	return Tasks
 }
 
 func GetTaskPrevious(UserId int64) []Task{
-
 	var Tasks []Task
 	db.Where("created_at is null").Find(&Tasks)
-
 	return Tasks
 }

@@ -9,8 +9,6 @@ export type AuthWrapperProps = {
 const AuthWrapper = ({children}: AuthWrapperProps) => {
 
     const checkSessionQuery = useCheckSessionQuery();
-    if(checkSessionQuery.status == "success") return <Navigate to="" />
-    if(checkSessionQuery.status == "error") return <Navigate to= "/login" />
 
     return (
         <div>

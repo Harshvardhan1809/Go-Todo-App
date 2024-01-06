@@ -3,6 +3,9 @@ import { AppBar, CssBaseline, Typography, Button, IconButton} from '@mui/materia
 import { Box } from '@mui/system';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
+import { useNavigate } from 'react-router-dom';
+import useCheckSessionQuery from '../../hooks/useCheckSessionQuery';
+import useLogoutMutation from '../../hooks/useLogoutMutation';
 
 // Using Box component from MUI System as a wrapper to give styling to MUI Material components
 
@@ -11,6 +14,12 @@ const Navbar = () => {
     const handleLightDarkModeChange = () => {
         return;
     }
+    const navigate = useNavigate();
+
+    // DO A QUERY AND GET USER NAME
+    const { data: sessionData, isLoading: sessionIsLoading, isSuccess: sessionIsSuccess, isError: sessionIsError } = useCheckSessionQuery();
+
+    const logoutMutation = useLogoutMutation({navigate});
 
     return (
         <Fragment>
@@ -24,12 +33,12 @@ const Navbar = () => {
                             <Typography variant="h6">TODO</Typography>
                         </Box>
 
-                        <Box sx={{"display":"flex", "padding-top": "10px", "margin-left": "auto", "margin-right": "10px"}}>
-                            <Box sx={{ "padding-left": "10px", "padding-top": "2.5px"}}>
-                                <Typography variant="h6">Harsh</Typography>
+                        <Box sx={{"display":"flex", "paddingTop": "10px", "marginLeft": "auto", "marginRight": "10px"}}>
+                            <Box sx={{ "paddingLeft": "10px", "paddingTop": "2.5px"}}>
+                                <Typography variant="h6">{sessionData.username}</Typography>
                             </Box>
-                            <Box sx={{"padding-left": "10px"}}>
-                                <Button variant="contained" color="success">Logout</Button>
+                            <Box sx={{"paddingLeft": "10px"}}>
+                                <Button variant="contained" color="success" onClick={() => logoutMutation.mutate({username: sessionData.username})}>Logout</Button>
                             </Box>
                             <Box sx={{"padding-left": "10px"}}>
                                 <IconButton onClick={handleLightDarkModeChange}>

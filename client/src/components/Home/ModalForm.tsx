@@ -1,10 +1,11 @@
-import React, { Fragment } from "react";
+import React, { type BaseSyntheticEvent, Fragment, useState, useMemo } from "react";
 import { Dialog, TextField, styled, Button, Typography, Box } from "@mui/material";
 import CreateIcon from '@mui/icons-material/Create';
 import StarIcon from '@mui/icons-material/Star';
-import theme from "../../utils/theme"
 import { DatePicker } from "@mui/x-date-pickers";
-import * as dayjs from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
+import useCreateTaskMutation from "../../hooks/useCreateTaskMutation";
+import useCheckSessionQuery from "../../hooks/useCheckSessionQuery";
 
 // attempt to reduce the inline CSS
 // can't use makeStyles since it is depreacted (@mui/styles)
@@ -39,21 +40,38 @@ const StyledImportantField = styled(Typography)(({theme}) => ({
 
 }))
 
-const ModalForm = (props: {open: boolean, handleClose: () => void}) => {
+interface FormDataType {
+    title: string,
+    description: string,
+    starred: boolean,
+    created_at: Dayjs,
+    status: string
+}
+
+const ModalForm = (props: {open: boolean, handleClose: (value: React.SetStateAction<boolean>) => void}) => {
+
+    const [formData, setFormData] = useState<FormDataType>({title: "", description: "", starred: false, created_at: dayjs(), status:"incomplete"});
 
     const isOpen = props.open;
-    const handleClose = props.handleClose;
-    const value = dayjs();
-    
-    const handleSubmit = () =>{
-        return 1
+    const handleClose = () => {
+        setFormData({...formData, starred: false});
+        props.handleClose(false);
     }
+
+    const checkSessionQuery = useCheckSessionQuery();
+    const createTaskMutation = useCreateTaskMutation(handleClose);
+
+    const starColor: string = useMemo(() => {
+        if (formData.starred == true) return "gold"
+        return "gray"
+    }, [formData]);
 
     return (
         <Fragment>
             <Dialog open={isOpen} onClose={handleClose}>
                 <Box sx={{"width": "450px"}}>
-                    <StyledForm action="" onSubmit={handleSubmit}>
+                    <StyledForm action="">
+
                         <Box sx={{"display": "flex", margin: "20px auto 5px auto"}}>
                             <CreateIcon sx={{"margin": "10px 10px 0px 0px"}}/>
                             <Typography variant="h4">
@@ -61,22 +79,25 @@ const ModalForm = (props: {open: boolean, handleClose: () => void}) => {
                             </Typography>
                         </Box>
 
-                        <StyledTextField label="Title" />
-                        <StyledTextField label="Description" />
-                        <Box sx={{"display": "flex", "width": "100%", marginLeft: "75px"}}>
+                        <StyledTextField label="Title" onChange={(e: BaseSyntheticEvent) => { setFormData({...formData, title: e.target.value})}}/>
+
+                        <StyledTextField label="Description" onChange={(e: BaseSyntheticEvent) => { setFormData({...formData, description: e.target.value})}}/>
+
+                        <Box sx={{"display": "flex", "width": "100%", marginLeft: "75px" }} >
                             <StyledImportantField> Important :</StyledImportantField>
-                            <Button>
-                                <StarIcon sx={{margin: "14px 0px 18px 0px"}}/>
+                            <Button disableRipple onClick={ () => setFormData({...formData, starred: !formData.starred}) }>
+                                <StarIcon sx={{margin: "14px 0px 18px 0px", color: `${starColor}` }}/>
                             </Button>
                         </Box>
+
                         <Box sx={{"display": "flex", "width": "100%", marginLeft: "75px"}}>
                             <StyledImportantField> Date :</StyledImportantField>
-                            <DatePicker value={value} />
+                            <DatePicker value={formData.created_at} onChange={(e: any) =>{ setFormData({...formData, created_at: e.format('YYYY-MM-DD HH:mm:ss')}) }} />
                         </Box>
                         
                         <StyledButtonDiv>
-                            <Button variant="outlined">Create task</Button>
-                            <Button variant="outlined">Clear</Button>
+                            <Button variant="outlined" onClick={() => { createTaskMutation.mutate({...formData, user_id: checkSessionQuery.data.ID}) }}>Create task</Button>
+                            <Button variant="outlined" onClick={() =>  setFormData({title: "", description: "", starred: false, created_at: dayjs(), status:"incomplete"}) }>Clear</Button>
                         </StyledButtonDiv>
 
                     </StyledForm>

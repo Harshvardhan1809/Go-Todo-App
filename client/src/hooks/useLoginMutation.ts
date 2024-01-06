@@ -1,4 +1,4 @@
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { config } from "../utils/axios";
 import { NavigateFunction } from "react-router-dom";
@@ -15,21 +15,18 @@ interface Options {
 const useLoginMutation = ({navigate}: Options) => {
 
     return useMutation({
-        mutationKey: "login",
+        mutationKey: ["login"],
         mutationFn: async (data: LoginFormDataType)  => { 
             const { username, password } = data;
             const body = JSON.stringify({username, password});
-            console.log("body of login mutation ", username, password)
-            const login = await axios.post("http://localhost:9010/auth/login", body, config)
-            console.log("login print ", login)
+            const login = await axios.post("http://localhost:9010/auth/login", body, config);
             return login;
         },  
         onSuccess: () => {
-            navigate("");
+            navigate("/");
         }, 
-        onError: () => {
-            console.log("Getting error for login mutation")
-            navigate("");
+        onError: (e: any) => {
+            console.log("Print error from login mutation", e);
         }
       })
       

@@ -129,7 +129,6 @@ const TodoList = (props: { modalOpen : () => void }) => {
                             <Button variant="contained" color="error" sx={{"margin": "0px 0px 0px 10px"}}>DELETE</Button>                 
                         </Box>
                     </Box> */}
-
                 </CardContent>
 
             </Card>

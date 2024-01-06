@@ -1,0 +1,4 @@
+server/bin/*
+server/pkg/*
+client/node_modules/*
+client/.vite/*

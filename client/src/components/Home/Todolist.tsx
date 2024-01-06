@@ -7,7 +7,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ButtonBase from '@mui/material/ButtonBase';
 import { DatePicker } from "@mui/x-date-pickers";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 const TodoList = (props: { modalOpen : () => void }) => {
     

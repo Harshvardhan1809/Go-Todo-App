@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"github.com/Harshvardhan1809/Go-Todo-App/config"
 	"github.com/Harshvardhan1809/Go-Todo-App/models"
+	"github.com/Harshvardhan1809/Go-Todo-App/utils"
 	"github.com/golang-jwt/jwt/v4"
 	_ "github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 	"io"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -19,6 +20,8 @@ type Claims struct {
 	Authorized bool   `json:"aut"`
 	jwt.RegisteredClaims
 }
+
+var apiErr utils.APIError;
 
 func Signup(w http.ResponseWriter, r *http.Request) {
 
@@ -37,7 +40,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	// HASH THE PASSWORD AND ASSIGN TO NEW USER
 	hash, err := bcrypt.GenerateFromPassword([]byte(formBody.Password), 10)
 	if err != nil {
-		log.Fatal("Error hashing the password")
+		utils.FillErrorResponse(&w, http.StatusInternalServerError, "Error during login, try again")
 	}
 
 	// CREATE A NEW USER
@@ -56,7 +59,6 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
-
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -75,19 +77,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// SEARCH IN DB
 	var user models.User
-	db := config.GetDB() //  ,
+	db := config.GetDB()
 	qError := db.Where("username=?", formBody.Username).Find(&user)
+	fmt.Print("")
 	if qError.Error != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
+		utils.FillErrorResponse(&w, http.StatusNotFound, "User does not exist, create user first")
 		return
 	}
 
 	// COMPARE INPUT PASSWORD WITH HASHED PASSWORD
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(formBody.Password))
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
+		utils.FillErrorResponse(&w, http.StatusBadRequest, "Incorrect password, enter again")
 		return
 	}
 
@@ -103,8 +104,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	jwtKey := os.Getenv("SECRET")
 	tokenString, err := token.SignedString([]byte(jwtKey))
 	if err != nil {
-		// If error in creating token return internal server error
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.FillErrorResponse(&w, http.StatusInternalServerError, "Error during login, try again")
 		return
 	}
 

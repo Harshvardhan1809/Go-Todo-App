@@ -36,6 +36,6 @@ func main() {
 	credentialsOk := handlers.AllowCredentials()
 	exposedHeaders := handlers.ExposedHeaders([]string{"Set-Cookie"})
 
-	log.Fatal(http.ListenAndServe(url, handlers.CORS(headersOk, methodsOk, originsOk)(r)))
+	log.Fatal(http.ListenAndServe(url, handlers.CORS(headersOk, methodsOk, originsOk, credentialsOk, exposedHeaders)(r)))
 
 }

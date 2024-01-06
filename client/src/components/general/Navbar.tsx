@@ -3,6 +3,9 @@ import { AppBar, CssBaseline, Typography, Button, IconButton} from '@mui/materia
 import { Box } from '@mui/system';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
+import { useNavigate } from 'react-router-dom';
+import useCheckSessionQuery from '../../hooks/useCheckSessionQuery';
+import useLogoutMutation from '../../hooks/useLogoutMutation';
 
 // Using Box component from MUI System as a wrapper to give styling to MUI Material components
 

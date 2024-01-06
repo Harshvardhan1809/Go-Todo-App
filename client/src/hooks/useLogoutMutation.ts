@@ -23,6 +23,7 @@ const useLogoutMutation = ({navigate}: Options) => {
             return logout;
         },  
         onSuccess: () => {
+            console.log("Successfully logged out")
             queryClient.invalidateQueries(["auth","session"])
             navigate("/login");
         }, 

@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/Harshvardhan1809/Go-Todo-App/config"
 	"github.com/Harshvardhan1809/Go-Todo-App/models"
+	"github.com/Harshvardhan1809/Go-Todo-App/utils"
 )
 
 type Claims struct {
@@ -27,11 +28,11 @@ func RequireAuth(w http.ResponseWriter, r *http.Request){
 	//fmt.Println("In auth middleware")
 
 	// Get the cookies from request
-	t, _ := r.Cookie("token")
-	//fmt.Println("Print the cookie ", t)
-	// if err != nil {
-	// 	fmt.Println("Cookie not found in the middleware")
-	// }
+	t, err := r.Cookie("token")
+	if err != nil {		
+		utils.FillErrorResponse(&w, http.StatusBadRequest, "Cookie not found, try again")
+		return
+	}
 	tokenString := t.Value
 
 	// Unhash it, check the expiry
@@ -45,14 +46,16 @@ func RequireAuth(w http.ResponseWriter, r *http.Request){
 	
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 
-		//fmt.Println("Claims checking ", claims);
-		// Got the token
-		// Check the exp
-		registerClaims := claims["RegisteredClaims"].(map[string]interface {}) // have to do this since the type of
+		registerClaims := claims["RegisteredClaims"].(map[string]interface {})
+		// have to do this since the type of
 		// claims["RegisteredClaims"] is not known so we have to do type assertion
 		expTime := registerClaims["exp"]
 		if float64(time.Now().Unix()) > expTime.(float64){
-			log.Fatal("Token expired")
+			http.SetCookie(w, &http.Cookie{
+				Name:    "token",
+				Expires: time.Now(),
+			})
+			w.WriteHeader(http.StatusOK)
 		}
 
 		// Find the user with the token
@@ -61,7 +64,7 @@ func RequireAuth(w http.ResponseWriter, r *http.Request){
 		db.Where("username=?", claims["Username"]).Find(&user)
 
 		if user.ID == 0 {
-			log.Fatal("User not found")
+			utils.FillErrorResponse(&w, http.StatusNotFound, "User not found, try again")
 		}	
 		
 		// User found attach to request 
@@ -71,12 +74,8 @@ func RequireAuth(w http.ResponseWriter, r *http.Request){
 		w.Write(res)
 		return
 	}
-	// } else {
-	// 	fmt.Println(err)
-	// }
 
-	w.WriteHeader(http.StatusUnauthorized)
-	//fmt.Println("User not found in the claims so we are sending error")
+	utils.FillErrorResponse(&w, http.StatusUnauthorized, "Unauthenticated, try again")
 	return
 }
 
@@ -100,19 +99,19 @@ func CheckSessionMiddleware (f http.HandlerFunc) http.HandlerFunc {
 		})
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
-				w.WriteHeader(http.StatusUnauthorized)
+				utils.FillErrorResponse(&w, http.StatusUnauthorized, "Error in authentication, try again")
 				return
 			}
-			w.WriteHeader(http.StatusBadRequest)
+			utils.FillErrorResponse(&w, http.StatusBadRequest, "Bad request, try again")
 			return
 		}
 		if !token.Valid {
-			w.WriteHeader(http.StatusUnauthorized)
+			utils.FillErrorResponse(&w, http.StatusUnauthorized, "Error in token, try again")
 			return
 		}
 
 		if time.Until(claims.ExpiresAt.Time) > 0*time.Second {
-			w.WriteHeader(http.StatusBadRequest)
+			utils.FillErrorResponse(&w, http.StatusUnauthorized, "Token expiration")
 			return
 		}
 		

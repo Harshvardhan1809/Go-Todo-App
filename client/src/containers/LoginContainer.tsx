@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, {Fragment, useState, useEffect} from 'react'
-import { Typography, Card, CardHeader, CardContent, CardActions, Box, TextField, Button, CssBaseline } from '@mui/material';
+import { Typography, Card, CardHeader, CardContent, CardActions, Box, TextField, Button, CssBaseline, Alert } from '@mui/material';
 import {useTheme} from '@mui/material';
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -41,6 +41,9 @@ const LoginContainer = React.memo(() => {
               <CardContent>
                 <form action="">
                   <Box sx={{display:"flex", flexDirection:"column"}}>
+                    {loginMutation.isError && (
+                      <Alert severity="error" sx={{marginBottom: "15px"}}>{loginMutation.error.response.data.Message}</Alert>
+                    )}
                     <TextField label="Username" variant="outlined" sx={{paddingBottom: "10px"}} name="username" onChange={onChangeUsername} value={username}/>
                     <TextField label="Password" variant="outlined" sx={{paddingBottom: "10px"}} name="password" onChange={onChangePassword} value={password}/>
                     <Button variant="outlined" sx={{margin: "auto", marginBottom: "10px", marginTop: "10px"}} 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useMutation } from "react-query"
+import { useMutation } from "@tanstack/react-query";
 import { NavigateFunction } from "react-router-dom";
 import { config } from "../utils/axios";
 
@@ -17,7 +17,6 @@ const useSignupMutation = ({navigate}: Options) => {
         mutationKey: ["signup"],
         mutationFn: async (data: SignupFormDataType) => {
             const { username, password } = data;
-            console.log(username, password)
             const body = JSON.stringify({username, password});
             const signup = await axios.post("http://localhost:9010/auth/signup", body, config)
             return signup;
@@ -26,7 +25,6 @@ const useSignupMutation = ({navigate}: Options) => {
             navigate("/login");
         }, 
         onError: () => {
-            console.log("Getting error for signup mutation")
             navigate("/signup");
         }
     })

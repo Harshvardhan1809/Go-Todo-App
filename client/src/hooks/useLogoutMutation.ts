@@ -1,7 +1,8 @@
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { config } from "../utils/axios";
 import { NavigateFunction } from "react-router-dom";
+import { queryClient } from "../utils/queryClient";
 
 export interface LogoutFormDataType {
     username: string,
@@ -22,11 +23,10 @@ const useLogoutMutation = ({navigate}: Options) => {
             return logout;
         },  
         onSuccess: () => {
-            console.log("In onSuccess")
+            queryClient.invalidateQueries(["auth","session"])
             navigate("/login");
         }, 
         onError: () => {
-            console.log("Getting error for login mutation")
             navigate("");
         }
       })

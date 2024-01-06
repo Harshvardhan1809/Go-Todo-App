@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"encoding/json"
 	"time"
 	"log"
@@ -23,9 +22,31 @@ var (
 	session *sessions.Session
 )
 
-func CheckSession(w http.ResponseWriter, r *http.Request){
+func SessionCheckSession(w http.ResponseWriter, r *http.Request){
 
 	fmt.Println("Print from the controller", w);
+	// store.GET creates a new session every time smh, we need cookie information from the mf request
+	store := config.GetSessionStore();
+	session, _ := store.Get(r, "k")
+	//fmt.Println("Print session in check session ", session.Values)
+
+	// CHECK IF THE USER EXISTS IN SESSION
+	if session.Values["username"] != "" {
+		//fmt.Println("Get user from DB ", session.Values["username"])
+		var user models.User
+		db := config.GetDB()
+		qError := db.Where("username=?", session.Values["username"]).Find(&user)
+		if qError.Error != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		res, _ := json.Marshal(user)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+	}
 
 	// utils.EnableCors(&w)
 
@@ -53,7 +74,7 @@ func CheckSession(w http.ResponseWriter, r *http.Request){
 	w.Write(res)
 }
 
-func Signup(w http.ResponseWriter, r *http.Request){
+func SessionSignup(w http.ResponseWriter, r *http.Request){
 
 	utils.EnableCors(&w)
 	fmt.Println("Print request body in signup ", r.Body)
@@ -96,7 +117,7 @@ func Signup(w http.ResponseWriter, r *http.Request){
 	w.Write(res)
 }
 
-func Login(w http.ResponseWriter, r *http.Request){
+func SessionLogin(w http.ResponseWriter, r *http.Request){
 
 	fmt.Println("In the auth controller")
 
@@ -136,6 +157,23 @@ func Login(w http.ResponseWriter, r *http.Request){
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	//fmt.Println("In the login controller")
+	session.Values["username"] = formBody.Username
+	session.Values["authenticated"] = true
+	//fmt.Println("Print the session values ", session.Values)
+	//fmt.Println("Print the session username ", session.Values["username"])
+	//fmt.Println("Print the session options ", session.Options.MaxAge)
+	//fmt.Println("Print the session name ", session.Name())
+	session.Options.SameSite = http.SameSiteLaxMode;
+	session.Options.HttpOnly = false;
+	session.Options.Path = "/";
+	session.Options.MaxAge = 60*60*3; //3hrs
+	sessErr := session.Save(r, w) // saves this session in the store
+	if sessErr != nil {
+		//fmt.Println("Can't store session in store")
+		http.Error(w, sessErr.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	// This is giving error
 	// session, _ := store.Get(r, "session-name")
@@ -146,7 +184,34 @@ func Login(w http.ResponseWriter, r *http.Request){
 
 	res, _ := json.Marshal(user)
 
+	//fmt.Println("Print the response", string(res))
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
 
+func SessionLogout (w http.ResponseWriter, r *http.Request) {
+
+	// GET THE USERNAME FROM THE REQ BODY
+	// io.ReadCloser -> []byte array -> string -> struct
+	var logoutBody struct {
+		Username string `json:"username,omitempty"`
+	}
+	bufOfRequestBody, _ := io.ReadAll(r.Body)
+	stringRequestBody := string(bufOfRequestBody)
+	json.Unmarshal([]byte(stringRequestBody), &logoutBody);
+
+	// CHECK SESSION AND RETURN 200
+	store := config.GetSessionStore();
+	session, _ := store.Get(r, "session-name")
+	if session.Values["username"] == logoutBody.Username {
+		session.Options.MaxAge = -1;
+		session.Save(r, w);
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+	}
+
+	// IF NO MATCH THEN RETURN 400 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+	return
+}

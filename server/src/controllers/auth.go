@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"github.com/Harshvardhan1809/Go-Todo-App/config"
 	"github.com/Harshvardhan1809/Go-Todo-App/models"
+	"github.com/Harshvardhan1809/Go-Todo-App/utils"
 	"github.com/golang-jwt/jwt/v4"
 	_ "github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 	"io"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -18,6 +19,36 @@ type Claims struct {
 	Username   string `json:"usr"`
 	Authorized bool   `json:"aut"`
 	jwt.RegisteredClaims
+}
+
+func CheckSession(w http.ResponseWriter, r *http.Request){
+
+	fmt.Println("Print from the controller", w);
+
+	// utils.EnableCors(&w)
+
+	store = config.GetSessionStore();
+	session, err := store.Get(r, "session-name")
+	if err != nil {
+		fmt.Println("Error - could not get a session with the name")
+	}
+
+	// check if authenticated
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// get the user from the session
+	user, _ := session.Values["data"].(*models.User)
+	res, _ := json.Marshal(user)
+
+	// return the user in the session
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
 
 func Signup(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +68,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	// HASH THE PASSWORD AND ASSIGN TO NEW USER
 	hash, err := bcrypt.GenerateFromPassword([]byte(formBody.Password), 10)
 	if err != nil {
-		log.Fatal("Error hashing the password")
+		utils.FillErrorResponse(&w, http.StatusInternalServerError, "Error during login, try again")
 	}
 
 	// CREATE A NEW USER
@@ -52,11 +83,17 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	u, _ := newUser.CreateUser()
 	res, _ := json.Marshal(u)
 
+	// EXPIRE THE COOKIE, WRITE TO RESPONSE
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Expires: time.Now(),
+	})
+	w.WriteHeader(http.StatusOK)
+
 	// WRITE TO RESPONSE
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
-
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -75,19 +112,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// SEARCH IN DB
 	var user models.User
-	db := config.GetDB() //  ,
+	db := config.GetDB()
 	qError := db.Where("username=?", formBody.Username).Find(&user)
+	fmt.Print("")
 	if qError.Error != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
+		utils.FillErrorResponse(&w, http.StatusNotFound, "User does not exist, create user first")
 		return
 	}
 
 	// COMPARE INPUT PASSWORD WITH HASHED PASSWORD
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(formBody.Password))
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
+		utils.FillErrorResponse(&w, http.StatusBadRequest, "Incorrect password, enter again")
 		return
 	}
 
@@ -103,8 +139,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	jwtKey := os.Getenv("SECRET")
 	tokenString, err := token.SignedString([]byte(jwtKey))
 	if err != nil {
-		// If error in creating token return internal server error
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.FillErrorResponse(&w, http.StatusInternalServerError, "Error during login, try again")
 		return
 	}
 

@@ -21,6 +21,36 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+func CheckSession(w http.ResponseWriter, r *http.Request){
+
+	fmt.Println("Print from the controller", w);
+
+	// utils.EnableCors(&w)
+
+	store = config.GetSessionStore();
+	session, err := store.Get(r, "session-name")
+	if err != nil {
+		fmt.Println("Error - could not get a session with the name")
+	}
+
+	// check if authenticated
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// get the user from the session
+	user, _ := session.Values["data"].(*models.User)
+	res, _ := json.Marshal(user)
+
+	// return the user in the session
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
+
 func Signup(w http.ResponseWriter, r *http.Request) {
 
 	// STRUCT FOR THE FORM BODY
